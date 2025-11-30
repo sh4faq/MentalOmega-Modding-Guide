@@ -72,15 +72,26 @@ The `Image=` property doesn't match the VXL filename.
 Image=YOURUNIT    ; Must match YOURUNIT.vxl exactly
 ```
 
-#### 4. VXL Not in MIX File
+#### 4. VXL/HVA Files Not Loading
 
-The VXL/HVA files aren't included in the MIX archive.
+The game can't find the VXL/HVA files.
 
-**Solution:** Verify files are in the MIX:
-```python
-# List MIX contents
-python -c "import struct; f=open('expandmo02.mix','rb'); print(struct.unpack('<H',f.read(6)[4:6])[0],'files')"
+**Solution - Use Loose Files (Recommended):**
+
+Place VXL/HVA files directly in the Mental Omega folder as loose files. Loose files take priority over MIX archives!
+
 ```
+Mental Omega/
+├── TANKIE.vxl      ← Loose file loads first!
+├── TANKIE.hva
+├── TANKIETUR.vxl
+└── TANKIETUR.hva
+```
+
+**Testing Approach:**
+1. First test with `Image=HTNK` (vanilla Rhino Tank)
+2. If that works, your INI is correct and the problem is your VXL files
+3. Use a known working VXL (like IronFist `wrmn.vxl`) as a template
 
 ---
 
