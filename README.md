@@ -23,6 +23,7 @@ This guide documents the process of adding custom voxel units to Mental Omega 3.
 3. **Image= Override**: Use `Image=NEWMODEL` to replace a unit's visual model
 4. **Section Names Must Match**: VXL and HVA section names must be identical
 5. **Working Reference**: IronFist example (`wrmn.vxl`/`wrmn.hva`) is a known working VXL/HVA pair
+6. **VOX Export Workflow**: Export Blender models to VOX format first for maximum quality (256³ resolution), then convert to VXL
 
 ## Quick Start - Working Example
 
@@ -123,6 +124,8 @@ Mental Omega/
 
 ### 3D Modeling
 - **Blender** + VXL addon - 3D modeling with VXL export
+- **Blender VOX Export** - High-quality VOX export script (`scripts/blender_vox_export.py`)
+- **MagicaVoxel** - View/edit VOX files before conversion
 
 ## Mental Omega Unit IDs
 

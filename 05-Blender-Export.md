@@ -2,6 +2,8 @@
 
 Guide for exporting VXL models from Blender for Red Alert 2 / Mental Omega.
 
+> **NEW: High-Quality VOX Export** - See [VOX Export Workflow](#vox-export-workflow-recommended) for the recommended method that produces excellent quality voxel models!
+
 ---
 
 ## Prerequisites
@@ -267,3 +269,173 @@ If Blender export fails, try:
 ### XCC Mixer
 - Inspect existing game VXL files
 - Extract reference models
+
+---
+
+## VOX Export Workflow (Recommended)
+
+The **recommended workflow** for creating high-quality voxel models is to export from Blender to VOX format first, then convert to VXL. This produces excellent results with full color preservation.
+
+### Why VOX First?
+
+1. **Maximum Quality**: VOX supports up to 256×256×256 resolution
+2. **Color Preservation**: Samples colors directly from textures/materials
+3. **MagicaVoxel Compatible**: Can edit in MagicaVoxel before conversion
+4. **Reliable Format**: Well-documented, widely supported format
+
+### Step 1: Prepare Your Model
+
+1. Import or create your model in Blender
+2. Apply textures/materials with colors you want
+3. Join all parts into a single mesh: Select all → `Ctrl+J`
+4. Apply transforms: `Ctrl+A` → All Transforms
+
+### Step 2: Export to VOX
+
+Use the included high-quality VOX exporter script:
+
+```bash
+# Location of the script
+scripts/blender_vox_export.py
+```
+
+**In Blender:**
+
+1. Open the **Text Editor** panel
+2. Click **Open** → Navigate to `scripts/blender_vox_export.py`
+3. Select your mesh object in the 3D viewport
+4. In the Text Editor, click **Run Script** (or press `Alt+P`)
+5. Check the console for export progress and output path
+
+**Export Settings (in script):**
+
+- `max_resolution=256` - Maximum quality (default)
+- Output path can be customized in the script
+
+### Step 3: Preview in MagicaVoxel (Optional)
+
+Open the exported `.vox` file in MagicaVoxel to:
+
+- Verify the model looks correct
+- Make manual edits if needed
+- Adjust colors or add details
+
+### Step 4: Convert VOX to VXL
+
+Use the included converter script:
+
+```bash
+cd scripts
+python vox_to_vxl.py path/to/yourmodel.vox
+```
+
+This creates:
+- `yourmodel.vxl` - The voxel model
+- `yourmodel.hva` - The animation file (identity transform)
+
+**With custom output name:**
+
+```bash
+python vox_to_vxl.py model.vox MYUNIT.vxl Body
+```
+
+Arguments:
+1. Input VOX file
+2. Output VXL filename (optional)
+3. Section name (optional, default: "Body")
+
+### Step 5: Validate and Test
+
+```bash
+python validate_vxl.py MYUNIT.vxl
+```
+
+Then copy to Mental Omega folder and test in-game.
+
+---
+
+## Complete VOX Workflow Example
+
+Here's a complete example exporting an Apocalypse Tank model:
+
+### 1. In Blender
+
+```
+1. Import your model (OBJ, FBX, etc.)
+2. Apply texture via UV mapping
+3. Select all mesh parts
+4. Join: Ctrl+J
+5. Rename to "ApocalypseTank"
+6. Apply transforms: Ctrl+A → All Transforms
+```
+
+### 2. Run VOX Export Script
+
+```python
+# In Blender's Text Editor, run:
+scripts/blender_vox_export.py
+
+# Output example:
+# Exporting: ApocalypseTank
+# Dimensions: 163 x 256 x 119
+# Total voxels: 379,063
+# Colors: 76
+# SUCCESS! Exported to: apocalypse_tank.vox
+```
+
+### 3. Convert to VXL
+
+```bash
+python scripts/vox_to_vxl.py apocalypse_tank.vox FTNKAPOC.vxl Body
+```
+
+### 4. Deploy to Game
+
+```bash
+# Copy files to Mental Omega folder
+copy FTNKAPOC.vxl "C:\Games\Mental Omega\"
+copy FTNKAPOC.hva "C:\Games\Mental Omega\"
+```
+
+### 5. Configure INI
+
+```ini
+[APOC]
+Image=FTNKAPOC
+```
+
+---
+
+## VOX Export Script Reference
+
+The `blender_vox_export.py` script features:
+
+| Feature | Description |
+|---------|-------------|
+| **Max Resolution** | 256×256×256 voxels (VOX format maximum) |
+| **Color Sampling** | Reads colors from UV-mapped textures |
+| **Palette Generation** | Automatically builds optimized 255-color palette |
+| **Progress Reporting** | Shows export progress for large models |
+| **Texture Support** | Works with any image texture in material nodes |
+
+### Customizing the Script
+
+Edit the bottom of the script to change output settings:
+
+```python
+# Custom output path
+output_path = r"C:\Users\YourName\Desktop\mymodel.vox"
+
+# Custom resolution (lower = smaller file, faster export)
+export_mesh_to_vox(output_path, max_resolution=128)
+```
+
+---
+
+## Tips for Best Quality
+
+1. **Use High-Res Textures**: The script samples colors from your texture
+2. **Clean UV Mapping**: Ensure UVs correctly map to texture areas
+3. **Proper Scale**: Model should be reasonably sized before export
+4. **Single Material**: For best results, use one material with one texture
+5. **Face Density**: More faces = more voxel samples = better detail
