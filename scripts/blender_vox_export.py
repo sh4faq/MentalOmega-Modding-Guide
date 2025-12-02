@@ -1,6 +1,8 @@
 """
 High-Quality VOX Exporter for Blender
-Exports Blender meshes to MagicaVoxel .vox format at maximum quality (256x256x256)
+Exports Blender meshes to MagicaVoxel .vox format at maximum quality (255x255x255)
+
+This is VXL-compatible (VXL format max dimension is 255 per axis).
 
 Usage in Blender:
     1. Open Blender
@@ -22,13 +24,13 @@ from mathutils import Vector
 from collections import defaultdict
 
 
-def export_mesh_to_vox(output_path, max_resolution=256):
+def export_mesh_to_vox(output_path, max_resolution=255):
     """
     Export active mesh to VOX format at maximum quality.
 
     Args:
         output_path: Path for output .vox file
-        max_resolution: Maximum voxel resolution (default 256, max for VOX format)
+        max_resolution: Maximum voxel resolution (default 255 for VXL compatibility)
 
     Returns:
         True on success, False on failure
