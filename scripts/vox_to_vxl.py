@@ -133,27 +133,17 @@ def map_color_to_ra2(color_index, vox_palette):
     """
     Map MagicaVoxel color to RA2 palette index.
 
-    RA2 palette:
-    - 16-31: Team color ramp (remappable)
-    - Other indices: Fixed colors
-
-    For best results, use grayscale colors that match RA2's palette.
+    Keep the original color index - the palette will be written to VXL file.
+    Avoid indices 16-31 which are reserved for team colors.
     """
     if color_index == 0:
         return 0
 
-    # Get original color from VOX palette
-    r, g, b, a = vox_palette[color_index - 1]  # VOX uses 1-indexed colors
+    # Keep original index, but shift if it falls in team color range (16-31)
+    if 16 <= color_index <= 31:
+        return color_index + 32  # Shift to safe range
 
-    # Calculate brightness
-    brightness = (r + g + b) // 3
-
-    # Map to RA2 grayscale palette
-    # Index 100-115 are typically good grayscale values
-    ra2_index = 100 + (brightness // 20)
-    ra2_index = min(ra2_index, 115)
-
-    return ra2_index
+    return color_index
 
 
 def create_vxl_from_grid(grid, dim_x, dim_y, dim_z, vox_palette, section_name="Body"):
@@ -256,9 +246,19 @@ def create_vxl_from_grid(grid, dim_x, dim_y, dim_z, vox_palette, section_name="B
     vxl_data.append(31)  # Remap end index (team color palette end)
 
     # --- Palette (768 bytes, starts at offset 34) ---
-    # Standard RA2 grayscale palette
+    # Write actual colors from VOX palette
+    # VOX uses 1-indexed colors: voxel color N uses palette[N-1]
+    # VXL palette index 0 is unused, index N should have color for voxels with color N
     for i in range(256):
-        vxl_data.extend(bytes([i, i, i]))
+        if i == 0:
+            # Index 0 is unused - write black
+            vxl_data.extend(bytes([0, 0, 0]))
+        elif i - 1 < len(vox_palette):
+            # Shift by 1: VXL palette[N] = VOX palette[N-1]
+            r, g, b, a = vox_palette[i - 1]
+            vxl_data.extend(bytes([r, g, b]))
+        else:
+            vxl_data.extend(bytes([128, 128, 128]))  # Fallback gray
 
     # --- Limb Header (28 bytes, starts at offset 802) ---
     name_bytes = section_name.encode('ascii')[:16].ljust(16, b'\x00')
@@ -301,8 +301,8 @@ def create_vxl_from_grid(grid, dim_x, dim_y, dim_z, vox_palette, section_name="B
     vxl_data.append(dim_y)
     vxl_data.append(dim_z)
 
-    # Normals mode (1 byte) - 2 = Tiberian Sun style
-    vxl_data.append(2)
+    # Normals mode (1 byte) - 2 = Tiberian Sun, 4 = Red Alert 2
+    vxl_data.append(4)
 
     return bytes(vxl_data), name_bytes
 
