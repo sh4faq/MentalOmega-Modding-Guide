@@ -1,4 +1,4 @@
-# Mental Omega 3.3.6 Custom Unit Modding Guide
+# Red Alert 2 Mental Omega 3.3.6 Custom Unit Modding Guide
 
 A comprehensive guide for adding custom voxel units to Mental Omega 3.3.6 (Red Alert 2: Yuri's Revenge mod).
 
